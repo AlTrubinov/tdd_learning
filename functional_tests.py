@@ -1,6 +1,48 @@
 from selenium import webdriver
+import unittest
 
-browser = webdriver.Firefox(executable_path="D:\\My Python APPs\\tdd_learning\\geckodriver\\0.32.0\\bin\\geckodriver.exe")
-browser.get('http://localhost:8000')
 
-assert 'Congratulations' in browser.title
+class NewVisitorTest(unittest.TestCase):
+    '''Тест нового посетителя'''
+
+    def setUp(self) -> None:
+        '''Установка'''
+        self.browser = webdriver.Firefox(
+            executable_path="D:\\My Python APPs\\tdd_learning\\geckodriver\\0.32.0\\bin\\geckodriver.exe")
+
+    def tearDown(self) -> None:
+        '''Выход из браузера'''
+        self.browser.quit()
+
+    def test_can_start_a_list_and_retrieve_it_later(self):
+        '''Тест: можно начать список и получить его позже'''
+        # Пользователь решает посетить домашнюю страницу онлайн-приложения неотложных дел
+        self.browser.get('http://localhost:8000')
+
+        # Пользователь видит заголовок и шапку страницы онлайн-приложения неотложных дел
+        self.assertIn('To-Do', self.browser.title)
+        self.fail('Закончить тест!')
+
+        # Пользователю сразу же предлагается ввести элемент списка
+
+        # Пользователь набирает в текстовом поле "Купить павлиньи перья" (его хобби –
+        # вязание рыболовных мушек)
+
+        # Когда пользователь нажимает enter, страница обновляется, и теперь страница
+        # содержит "1: Купить павлиньи перья" в качестве элемента списка
+
+        # Текстовое поле по-прежнему приглашает пользователя добавить еще один элемент.
+        # Пользователь вводит "Сделать мушку из павлиньих перьев"
+
+        # Страница снова обновляется, и теперь показывает оба элемента списка
+
+        # Пользователю интересно, запомнит ли сайт список. Далее пользователь видит, что
+        # сайт сгенерировал для него уникальный URL-адрес – об этом
+        # выводится небольшой текст с объяснениями.
+
+        # Пользователь посещает этот URL-адрес – список по-прежнему там.
+
+        # Пользователь выходит из браузера
+
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')
