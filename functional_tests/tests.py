@@ -97,7 +97,7 @@ class NewVisitorTest(LiveServerTestCase):
         ## Мы используем новый сеанс браузера, тем самым обеспечивая, чтобы никакая
         ## информация от Эдит не прошла через данные cookie и пр.
         self.browser.quit()
-        self.browser = webdriver.Firefox()
+        self.browser = webdriver.Firefox(executable_path="/geckodriver/0.32.0/bin/geckodriver.exe")
 
         # Посетитель заходит на домашнюю страницу. Нет никаких признаков списка Пользователя
         self.browser.get(self.live_server_url)
