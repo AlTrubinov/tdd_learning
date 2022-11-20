@@ -34,8 +34,8 @@ class NewVisitorTest(LiveServerTestCase):
                     raise e
                 time.sleep(0.3)
 
-    def test_can_start_a_list_and_retrieve_it_later(self):
-        '''Тест: можно начать список и получить его позже'''
+    def test_can_start_a_list_for_one_user(self):
+        '''Тест: можно начать список для одного пользователя'''
         # Пользователь решает посетить домашнюю страницу онлайн-приложения неотложных дел
         self.browser.get(self.live_server_url)
 
@@ -55,13 +55,13 @@ class NewVisitorTest(LiveServerTestCase):
         # вязание рыболовных мушек)
         inputbox.send_keys('Купить павлиньи перья')
 
-        # Когда пользователь нажимает enter, страница обновляется, и теперь страница
+        # Когда Пользователь нажимает enter, страница обновляется, и теперь страница
         # содержит "1: Купить павлиньи перья" в качестве элемента списка
         inputbox.send_keys(Keys.ENTER)
 
         self.wait_for_row_in_list_table('1: Купить павлиньи перья')
 
-        # Текстовое поле по-прежнему приглашает пользователя добавить еще один элемент.
+        # Текстовое поле по-прежнему приглашает Пользователя добавить еще один элемент.
         # Пользователь вводит "Сделать мушку из павлиньих перьев"
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         inputbox.send_keys('Сделать мушку из павлиньих перьев')
@@ -71,11 +71,56 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table('1: Купить павлиньи перья')
         self.wait_for_row_in_list_table('2: Сделать мушку из павлиньих перьев')
 
-        # Пользователю интересно, запомнит ли сайт список. Далее пользователь видит, что
+        # Пользователю интересно, запомнит ли сайт список. Далее Пользователь видит, что
         # сайт сгенерировал для него уникальный URL-адрес – об этом
         # выводится небольшой текст с объяснениями.
-        self.fail('Закончить тест!')
 
         # Пользователь посещает этот URL-адрес – список по-прежнему там.
 
         # Пользователь выходит из браузера
+
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+        '''Тест: многочисленные пользователи могут начать списки по разным url'''
+        # Пользователь начинает новый список
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        inputbox.send_keys('Купить павлиньи перья')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Купить павлиньи перья')
+
+        # Пользователь замечает, что новый список имеет уникальный URL-адрес
+        user_list_url = self.browser.current_url
+        self.assertRegex(user_list_url, '/lists/.+')
+
+        # Теперь новый Посетитель приходит на сайт.
+
+        ## Мы используем новый сеанс браузера, тем самым обеспечивая, чтобы никакая
+        ## информация от Эдит не прошла через данные cookie и пр.
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # Посетитель заходит на домашнюю страницу. Нет никаких признаков списка Пользователя
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element(By.TAG_NAME, 'body').text
+        self.assertNotIn('Купить павлиньи перья', page_text)
+        self.assertNotIn('Сделать мушку из павлиньих перьев', page_text)
+
+        # Посетитель начинает новый список, вводя новый элемент
+        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        inputbox.send_keys('Купить молоко')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Купить молоко')
+
+        # Посетитель получает уникальный URL-адрес
+        visitor_list_url = self.browser.current_url
+        self.assertRegex(visitor_list_url, '/lists/.+')
+        self.assertNotEqual(visitor_list_url, user_list_url)
+
+        # Следов списка Пользователя нет
+        page_text = self.browser.find_element(By.TAG_NAME, 'body').text
+        self.assertNotIn('Купить павлиньи перья', page_text)
+        self.assertIn('Купить молоко', page_text)
+
+        #Пользователь и посетитель покинули приложение
+
+
