@@ -1,17 +1,18 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from django.test import LiveServerTestCase
 import time
 import unittest
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     '''Тест нового посетителя'''
 
     def setUp(self) -> None:
         '''Установка'''
         self.browser = webdriver.Firefox(
-            executable_path="D:\\My Python APPs\\tdd_learning\\geckodriver\\0.32.0\\bin\\geckodriver.exe")
+            executable_path="/geckodriver/0.32.0/bin/geckodriver.exe")
 
     def tearDown(self) -> None:
         '''Выход из браузера'''
@@ -26,7 +27,7 @@ class NewVisitorTest(unittest.TestCase):
     def test_can_start_a_list_and_retrieve_it_later(self):
         '''Тест: можно начать список и получить его позже'''
         # Пользователь решает посетить домашнюю страницу онлайн-приложения неотложных дел
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # Пользователь видит заголовок и шапку страницы онлайн-приложения неотложных дел
         self.assertIn('To-Do', self.browser.title)
@@ -72,5 +73,4 @@ class NewVisitorTest(unittest.TestCase):
         # Пользователь выходит из браузера
 
 
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
+
